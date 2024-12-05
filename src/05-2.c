@@ -27,10 +27,10 @@ i32 get_fix_pos(
         i32 before = pairs[idx].before;
         i32 after = pairs[idx].after;
         if (n == before) {
-            fprintf(stderr, "|%d %d| ", before, after);
+            eprintf("|%d %d| ", before, after);
         }
         if (n == before && seen[after] >= 0) {
-            fprintf(stderr, "[!%d] ", after);
+            eprintf("[!%d] ", after);
             return seen[after];
         }
     }
@@ -40,7 +40,7 @@ i32 get_fix_pos(
 int main() {
     FILE *f = fopen("data/05", "r");
     if (!f) {
-        fprintf(stderr, "Could not open file\n");
+        eprintf("Could not open file\n");
         exit(1);
     }
 
@@ -81,7 +81,7 @@ int main() {
             }
         }
 
-        fprintf(stderr, "o> ");
+        eprintf("o> ");
         bool met_rules = true;
         while (true) {
 start:
@@ -89,14 +89,14 @@ start:
             reset_seen(seen);
             for (i32 idx = 0; idx < n_numbers; idx += 1) {
                 i32 n = row[idx];
-                fprintf(stderr, "\n\t(%d @ %d) ", n, idx);
+                eprintf("\n\t(%d @ %d) ", n, idx);
                 i32 fix_pos = get_fix_pos(pairs, n_pairs, seen, n);
-                fprintf(stderr, "(fp %d) ", fix_pos);
+                eprintf("(fp %d) ", fix_pos);
                 if (fix_pos >= 0) {
                     row[idx] = row[fix_pos];
                     row[fix_pos] = n;
                     met_rules = false;
-                    fprintf(stderr, "{%d<->%d} ", idx, fix_pos);
+                    eprintf("{%d<->%d} ", idx, fix_pos);
                     goto start;
                 } else {
                     seen[n] = idx;
@@ -104,14 +104,14 @@ start:
             }
             break;
         }
-        fprintf(stderr, "\n");
+        eprintf("\n");
 
-        fprintf(stderr, "n> ");
+        eprintf("n> ");
         for (i32 idx = 0; idx < n_numbers; idx += 1) {
             i32 n = row[idx];
-            fprintf(stderr, "%d ", n);
+            eprintf("%d ", n);
         }
-        fprintf(stderr, "\n\n");
+        eprintf("\n\n");
 
         if (!met_rules) {
             i32 mid = row[n_numbers / 2];

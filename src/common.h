@@ -1,7 +1,8 @@
 #pragma once
 
-#include <stdint.h>
+#include <stdarg.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef int8_t int8;
 typedef int16_t int16;
@@ -48,3 +49,10 @@ typedef float64 f64;
     __typeof__ (b) _b = (b); \
     _a < _b ? _a : _b;       \
 })
+
+void eprintf(const char *format, ...) {
+    va_list vargs;
+    va_start(vargs, format);
+    vfprintf(stderr, format, vargs);
+    va_end(vargs);
+}

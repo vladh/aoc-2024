@@ -17,11 +17,11 @@ int main() {
 
     while (*curr) {
         if (pstr_starts_with(curr, "do()")) {
-            fprintf(stderr, "ENABLED\n");
+            eprintf("ENABLED\n");
             is_mul_enabled = true;
         }
         if (pstr_starts_with(curr, "don't()")) {
-            fprintf(stderr, "DISABLED\n");
+            eprintf("DISABLED\n");
             is_mul_enabled = false;
         }
         if (pstr_starts_with(curr, "mul(")) {
@@ -67,10 +67,10 @@ int main() {
             }
 
             if (is_mul_enabled) {
-                fprintf(stderr, "%d * %d\n", a, b);
+                eprintf("%d * %d\n", a, b);
                 sum += a * b;
             } else {
-                fprintf(stderr, "DISABLED %d * %d\n", a, b);
+                eprintf("DISABLED %d * %d\n", a, b);
             }
         }
         curr += 1;

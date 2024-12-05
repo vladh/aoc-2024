@@ -57,7 +57,7 @@ int main() {
                 continue;
             }
 
-            fprintf(stderr, "%d * %d\n", a, b);
+            eprintf("%d * %d\n", a, b);
             sum += a * b;
         }
         curr += 1;

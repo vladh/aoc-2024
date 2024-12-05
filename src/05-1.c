@@ -21,7 +21,7 @@ bool are_rules_met(
         i32 before = pairs[idx].before;
         i32 after = pairs[idx].after;
         if (n == before && seen[after]) {
-            fprintf(stderr, " (OOPS! saw %d but already saw %d)", before, after);
+            eprintf(" (OOPS! saw %d but already saw %d)", before, after);
             return false;
         }
     }
@@ -31,7 +31,7 @@ bool are_rules_met(
 int main() {
     FILE *f = fopen("data/05", "r");
     if (!f) {
-        fprintf(stderr, "Could not open file\n");
+        eprintf("Could not open file\n");
         exit(1);
     }
 
@@ -76,7 +76,7 @@ int main() {
         bool met_rules = true;
         for (i32 idx = 0; idx < n_numbers; idx += 1) {
             i32 n = row[idx];
-            fprintf(stderr, "%d ", n);
+            eprintf("%d ", n);
             if (!are_rules_met(pairs, n_pairs, seen, n)) {
                 met_rules = false;
                 break;
@@ -85,10 +85,10 @@ int main() {
         }
         if (met_rules) {
             i32 mid = row[n_numbers / 2];
-            fprintf(stderr, " (VALID!) (mid is %d)", mid);
+            eprintf(" (VALID!) (mid is %d)", mid);
             sum += mid;
         }
-        fprintf(stderr, "\n");
+        eprintf("\n");
     }
 end:
 

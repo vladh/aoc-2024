@@ -9,7 +9,7 @@ i64 sign(i64 n) {
 int main() {
     FILE *f = fopen("data/02", "r");
     if (!f) {
-        fprintf(stderr, "Could not open file\n");
+        eprintf("Could not open file\n");
         exit(1);
     }
 
@@ -36,14 +36,14 @@ int main() {
                 (idx > 1 && (sign(d) != sign(d_prev))) ||
                 (abs(d) < 1 || abs(d) > 3)
             ) {
-                fprintf(stderr, " (not ok)\n");
+                eprintf(" (not ok)\n");
                 is_safe = false;
             } else {
-                fprintf(stderr, " (ok)\n");
+                eprintf(" (ok)\n");
             }
         }
         if (c == '\n') {
-            fprintf(stderr, "-> (safe? %d)\n", is_safe);
+            eprintf("-> (safe? %d)\n", is_safe);
             idx = 0;
             if (is_safe) {
                 n_safe_reports += 1;

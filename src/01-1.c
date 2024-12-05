@@ -23,7 +23,7 @@ int main() {
 
     FILE *f = fopen("data/01", "r");
     if (!f) {
-        fprintf(stderr, "Could not open file\n");
+        eprintf("Could not open file\n");
         exit(1);
     }
 
