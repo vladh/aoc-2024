@@ -14,11 +14,8 @@ struct Pos {
 
 enum Dir { UP, DOWN, LEFT, RIGHT };
 
-bool is_guard_in_bounds(struct Pos guard_pos, i32 grid_width, i32 grid_height) {
-    return guard_pos.x > 0 &&
-        guard_pos.x < grid_width &&
-        guard_pos.y > 0 &&
-        guard_pos.y < grid_height;
+bool is_in_bounds(struct Pos pos, i32 grid_width, i32 grid_height) {
+    return pos.x > 0 && pos.x < grid_width && pos.y > 0 && pos.y < grid_height;
 }
 
 struct Pos get_next_guard_pos(struct Pos guard_pos, enum Dir guard_dir) {
@@ -115,20 +112,23 @@ int main() {
     i32 pos_count = 0;
     struct Pos next_guard_pos;
 
-    while (is_guard_in_bounds(guard_pos, grid_width, grid_height)) {
-        print_grid(
-            grid_width,
-            grid_height,
-            visited,
-            obstacles,
-            guard_pos,
-            guard_dir
-        );
+    while (true) {
+        /* print_grid( */
+        /*     grid_width, */
+        /*     grid_height, */
+        /*     visited, */
+        /*     obstacles, */
+        /*     guard_pos, */
+        /*     guard_dir */
+        /* ); */
         if (!visited[guard_pos.x][guard_pos.y]) {
             pos_count += 1;
             visited[guard_pos.x][guard_pos.y] = true;
         }
         struct Pos next_guard_pos = get_next_guard_pos(guard_pos, guard_dir);
+        if (!is_in_bounds(next_guard_pos, grid_width, grid_height)) {
+            break;
+        }
         if (obstacles[next_guard_pos.x][next_guard_pos.y]) {
             guard_dir = get_rotated_dir(guard_dir);
             next_guard_pos = get_next_guard_pos(guard_pos, guard_dir);

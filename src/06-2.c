@@ -14,7 +14,11 @@ struct Pos {
 
 enum Dir { UP, DOWN, LEFT, RIGHT };
 
-bool is_visited_any_dir(bool visited_dir[GRID_SIZE][GRID_SIZE][4], i32 x, i32 y) {
+bool visited_dir[GRID_SIZE][GRID_SIZE][4] = {0};
+bool obstacles[GRID_SIZE][GRID_SIZE] = {0};
+bool found_loops[GRID_SIZE][GRID_SIZE] = {0};
+
+bool is_visited_any_dir(i32 x, i32 y) {
     return visited_dir[x][y][0] ||
         visited_dir[x][y][1] ||
         visited_dir[x][y][2] ||
@@ -24,8 +28,6 @@ bool is_visited_any_dir(bool visited_dir[GRID_SIZE][GRID_SIZE][4], i32 x, i32 y)
 void print_grid(
     i32 grid_width,
     i32 grid_height,
-    bool visited_dir[GRID_SIZE][GRID_SIZE][4],
-    bool obstacles[GRID_SIZE][GRID_SIZE],
     struct Pos guard_pos,
     enum Dir guard_dir
 ) {
@@ -43,7 +45,7 @@ void print_grid(
                 } else if (guard_dir == RIGHT) {
                     eprintf(">");
                 }
-            } else if (is_visited_any_dir(visited_dir, x, y)) {
+            } else if (is_visited_any_dir(x, y)) {
                 eprintf("X");
             } else {
                 eprintf(".");
@@ -54,11 +56,8 @@ void print_grid(
     eprintf("\n");
 }
 
-bool is_guard_in_bounds(struct Pos guard_pos, i32 grid_width, i32 grid_height) {
-    return guard_pos.x >= 0 &&
-        guard_pos.x < grid_width &&
-        guard_pos.y >= 0 &&
-        guard_pos.y < grid_height;
+bool is_in_bounds(struct Pos pos, i32 grid_width, i32 grid_height) {
+    return pos.x >= 0 && pos.x < grid_width && pos.y >= 0 && pos.y < grid_height;
 }
 
 enum Dir get_rotated_dir(enum Dir guard_dir) {
@@ -88,9 +87,13 @@ struct Pos get_next_guard_pos(struct Pos guard_pos, enum Dir guard_dir) {
 struct Pos get_next_walkable_guard_pos_and_dir(
     struct Pos guard_pos,
     enum Dir *guard_dir,
-    bool obstacles[GRID_SIZE][GRID_SIZE]
+    i32 grid_width,
+    i32 grid_height
 ) {
     struct Pos next_guard_pos = get_next_guard_pos(guard_pos, *guard_dir);
+    if (!is_in_bounds(next_guard_pos, grid_width, grid_height)) {
+        return next_guard_pos;
+    }
     while (obstacles[next_guard_pos.x][next_guard_pos.y]) {
         *guard_dir = get_rotated_dir(*guard_dir);
         next_guard_pos = get_next_guard_pos(guard_pos, *guard_dir);
@@ -101,37 +104,42 @@ struct Pos get_next_walkable_guard_pos_and_dir(
 bool is_loop_possible(
     i32 grid_width,
     i32 grid_height,
-    bool visited_dir[GRID_SIZE][GRID_SIZE][4],
-    bool obstacles[GRID_SIZE][GRID_SIZE],
     struct Pos guard_pos,
     enum Dir guard_dir
 ) {
+    bool found_loop = false;
     bool visited_dir_local[GRID_SIZE][GRID_SIZE][4] = {0};
-    guard_dir = get_rotated_dir(guard_dir);
 
-    while (is_guard_in_bounds(guard_pos, grid_width, grid_height)) {
-        struct Pos next_guard_pos = get_next_walkable_guard_pos_and_dir(guard_pos, &guard_dir, obstacles);
+    struct Pos next_guard_pos = get_next_walkable_guard_pos_and_dir(guard_pos, &guard_dir, grid_width, grid_height);
+    struct Pos test_obstacle_pos = next_guard_pos;
+    obstacles[test_obstacle_pos.x][test_obstacle_pos.y] = true;
+
+    while (true) {
+        next_guard_pos = get_next_walkable_guard_pos_and_dir(guard_pos, &guard_dir, grid_width, grid_height);
+        if (!is_in_bounds(next_guard_pos, grid_width, grid_height)) {
+            break;
+        }
+
         visited_dir_local[guard_pos.x][guard_pos.y][guard_dir] = true;
 
         if (
             visited_dir[next_guard_pos.x][next_guard_pos.y][guard_dir] ||
             visited_dir_local[next_guard_pos.x][next_guard_pos.y][guard_dir]
         ) {
-            return true;
+            found_loop = true;
+            break;
         }
 
         guard_pos = next_guard_pos;
     }
 
-    return false;
+    obstacles[test_obstacle_pos.x][test_obstacle_pos.y] = false;
+    return found_loop;
 }
 
 int main() {
     i32 grid_width;
     i32 grid_height;
-    bool visited_dir[GRID_SIZE][GRID_SIZE][4] = {0};
-    bool obstacles[GRID_SIZE][GRID_SIZE] = {0};
-    bool found_loop[GRID_SIZE][GRID_SIZE] = {0};
     struct Pos guard_pos;
     enum Dir guard_dir = UP;
 
@@ -163,34 +171,24 @@ int main() {
     i32 possible_loop_count = 0;
     struct Pos next_guard_pos;
 
-    while (is_guard_in_bounds(guard_pos, grid_width, grid_height)) {
-        /* print_grid( */
-        /*     grid_width, */
-        /*     grid_height, */
-        /*     visited_dir, */
-        /*     obstacles, */
-        /*     guard_pos, */
-        /*     guard_dir */
-        /* ); */
+    while (true) {
+        /* print_grid(grid_width, grid_height, guard_pos, guard_dir); */
 
-        struct Pos next_guard_pos = get_next_walkable_guard_pos_and_dir(guard_pos, &guard_dir, obstacles);
+        struct Pos next_guard_pos = get_next_walkable_guard_pos_and_dir(guard_pos, &guard_dir, grid_width, grid_height);
+        if (!is_in_bounds(next_guard_pos, grid_width, grid_height)) {
+            break;
+        }
+
         visited_dir[guard_pos.x][guard_pos.y][guard_dir] = true;
 
         if (
-            !found_loop[next_guard_pos.x][next_guard_pos.y] &&
-            !is_visited_any_dir(visited_dir, next_guard_pos.x, next_guard_pos.y)
+            !found_loops[next_guard_pos.x][next_guard_pos.y] &&
+            !is_visited_any_dir(next_guard_pos.x, next_guard_pos.y)
         ) {
-            bool have_loop = is_loop_possible(
-                grid_width,
-                grid_height,
-                visited_dir,
-                obstacles,
-                guard_pos,
-                guard_dir
-            );
+            bool have_loop = is_loop_possible(grid_width, grid_height, guard_pos, guard_dir);
             if (have_loop) {
                 possible_loop_count += 1;
-                found_loop[next_guard_pos.x][next_guard_pos.y] = true;
+                found_loops[next_guard_pos.x][next_guard_pos.y] = true;
             }
         }
 
