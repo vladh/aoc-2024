@@ -11,8 +11,9 @@ enum Op {
     OP_FIRST = 0,
     OP_ADD = 0,
     OP_MUL = 1,
-    OP_LAST = 1,
-    OP_COUNT = 2,
+    OP_CONCAT = 2,
+    OP_LAST = 2,
+    OP_COUNT = 3,
 };
 
 u64 apply_op(enum Op op, u64 a, u64 b) {
@@ -20,6 +21,18 @@ u64 apply_op(enum Op op, u64 a, u64 b) {
         return a + b;
     } else if (op == OP_MUL) {
         return a * b;
+    } else if (op == OP_CONCAT) {
+        u64 b_power = (u64)pow(10, (u64)log10(b));
+        while (true) {
+            u64 b_first_digit = b / b_power;
+            a = a * 10 + b_first_digit;
+            b = b - b_first_digit * b_power;
+            if (b_power <= 1) {
+                break;
+            }
+            b_power /= 10;
+        }
+        return a;
     }
     assert(false);
 }
