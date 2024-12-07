@@ -73,12 +73,12 @@ int main() {
         u64 terms[MAX_N_TERMS] = {0};
         i32 n_terms = 0;
 
-        if (fscanf(f, "%llu: ", &target_result) != 1) {
+        if (fscanf(f, "%lu: ", &target_result) != 1) {
             break;
         }
 
         while (true) {
-            assert(fscanf(f, "%llu%c", &term, &c) == 2);
+            assert(fscanf(f, "%lu%c", &term, &c) == 2);
             terms[n_terms] = term;
             n_terms += 1;
             assert(n_terms <= MAX_N_TERMS);
@@ -95,7 +95,7 @@ int main() {
         }
     }
 
-    printf("%d\n", sum);
+    printf("%lu\n", sum);
 
     return 0;
 }
