@@ -14,22 +14,33 @@ struct Pos {
     i32 y;
 };
 
-struct Pos pos_dist(struct Pos a, struct Pos b) {
-    return (struct Pos) {
-        .x = abs(a.x - b.x),
-        .y = abs(a.y - b.y),
+struct Dist {
+    i32 x;
+    i32 y;
+};
+
+struct Dist pos_dist(struct Pos a, struct Pos b) {
+    return (struct Dist) {
+        .x = a.x - b.x,
+        .y = a.y - b.y,
     };
+}
+
+bool dist_is_double(struct Dist a, struct Dist b) {
+    return (
+        (a.x == b.x * 2 && a.y == b.y * 2) ||
+        (b.x == a.x * 2 && b.y == a.y * 2)
+    );
 }
 
 int main() {
     i32 grid_width;
     i32 grid_height;
 
-    int fd = open("data/08-test", O_RDONLY);
+    int fd = open("data/08", O_RDONLY);
     int len = lseek(fd, 0, SEEK_END);
     char *data = mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
     char *curr = data;
-    char map[GRID_SIZE][GRID_SIZE] = {0};
     i32 x = 0;
     i32 y = 0;
     i32 n_antennas[MAX_N_ANTENNA_TYPES] = {0};
@@ -42,7 +53,6 @@ int main() {
             x = 0;
         } else {
             if (*curr != '.') {
-                map[x][y] = *curr;
                 i32 idx_c = (int)*curr;
                 antennas[idx_c][n_antennas[idx_c]] = (struct Pos) { .x = x, .y = y };
                 n_antennas[idx_c] += 1;
@@ -54,48 +64,35 @@ int main() {
 
     grid_height = y;
 
+    i32 n_antinodes = 0;
+
     for (i32 y = 0; y < grid_height; y += 1) {
         for (i32 x = 0; x < grid_width; x += 1) {
-            if (map[x][y] == 0) {
-                eprintf(".");
-            } else {
-                eprintf("%c", map[x][y]);
+            struct Pos pos = { .x = x, .y = y };
+            for (i32 idx_type = 0; idx_type < MAX_N_ANTENNA_TYPES; idx_type += 1) {
+                for (i32 idx_antenna1 = 0; idx_antenna1 < n_antennas[idx_type]; idx_antenna1 += 1) {
+                    struct Pos antenna1 = antennas[idx_type][idx_antenna1];
+                    for (i32 idx_antenna2 = idx_antenna1 + 1; idx_antenna2 < n_antennas[idx_type]; idx_antenna2 += 1) {
+                        struct Pos antenna2 = antennas[idx_type][idx_antenna2];
+                        struct Dist dist1 = pos_dist(pos, antenna1);
+                        struct Dist dist2 = pos_dist(pos, antenna2);
+                        if (dist_is_double(dist1, dist2)) {
+                            /* eprintf("(%d, %d) with (%d, %d) and (%d, %d)\n", */
+                            /*     x, y, */
+                            /*     antenna1.x, antenna1.y, */
+                            /*     antenna2.x, antenna2.y); */
+                            n_antinodes += 1;
+                            goto end_pos;
+                        }
+                    }
+                }
             }
-        }
-        eprintf("\n");
-    }
-
-    eprintf("\n");
-
-    for (i32 idx_type = 0; idx_type < MAX_N_ANTENNA_TYPES; idx_type += 1) {
-        if (n_antennas[idx_type] > 0) {
-            eprintf("%c: ", idx_type);
-        }
-        for (i32 idx_antenna = 0; idx_antenna < n_antennas[idx_type]; idx_antenna += 1) {
-            struct Pos antenna = antennas[idx_type][idx_antenna];
-            eprintf("(%d,%d) ", antenna.x, antenna.y);
-        }
-        if (n_antennas[idx_type] > 0) {
-            eprintf("\n");
+end_pos:
+            ;
         }
     }
 
-    for (i32 idx_type = 0; idx_type < MAX_N_ANTENNA_TYPES; idx_type += 1) {
-        if (n_antennas[idx_type] > 0) {
-            eprintf("%c:\n", idx_type);
-        }
-        for (i32 idx_antenna1 = 0; idx_antenna1 < n_antennas[idx_type]; idx_antenna1 += 1) {
-            struct Pos antenna1 = antennas[idx_type][idx_antenna1];
-            for (i32 idx_antenna2 = idx_antenna1 + 1; idx_antenna2 < n_antennas[idx_type]; idx_antenna2 += 1) {
-                struct Pos antenna2 = antennas[idx_type][idx_antenna2];
-                struct Pos dist = pos_dist(antenna1, antenna2);
-                eprintf("\t(d(%d, %d) = (%d, %d))\n", idx_antenna1, idx_antenna2, dist.x, dist.y);
-            }
-        }
-        if (n_antennas[idx_type] > 0) {
-            eprintf("\n");
-        }
-    }
+    printf("%d\n", n_antinodes);
 
     return 0;
 }
