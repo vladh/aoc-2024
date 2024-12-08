@@ -7,6 +7,12 @@
 
 #define GRID_SIZE 100
 #define MAX_N_ANTENNA_TYPES 256
+#define MAX_N_ANTENNAS 256
+
+struct Antenna {
+    i32 x;
+    i32 y;
+};
 
 int main() {
     i32 grid_width;
@@ -20,6 +26,7 @@ int main() {
     i32 x = 0;
     i32 y = 0;
     i32 n_antennas[MAX_N_ANTENNA_TYPES] = {0};
+    struct Antenna antennas[MAX_N_ANTENNA_TYPES][MAX_N_ANTENNAS] = {0};
 
     while (*curr) {
         if (*curr == '\n') {
@@ -29,7 +36,9 @@ int main() {
         } else {
             if (*curr != '.') {
                 map[x][y] = *curr;
-                n_antennas[(int)*curr] += 1;
+                i32 idx_c = (int)*curr;
+                antennas[idx_c][n_antennas[idx_c]] = (struct Antenna) { .x = x, .y = y };
+                n_antennas[idx_c] += 1;
             }
             x += 1;
         }
@@ -51,9 +60,16 @@ int main() {
 
     eprintf("\n");
 
-    for (i32 i = 0; i < MAX_N_ANTENNA_TYPES; i += 1) {
-        if (n_antennas[i] > 0) {
-            printf("%c: %d\n", i, n_antennas[i]);
+    for (i32 idx_type = 0; idx_type < MAX_N_ANTENNA_TYPES; idx_type += 1) {
+        if (n_antennas[idx_type] > 0) {
+            eprintf("%c: ", idx_type);
+        }
+        for (i32 idx_antenna = 0; idx_antenna < n_antennas[idx_type]; idx_antenna += 1) {
+            struct Antenna antenna = antennas[idx_type][idx_antenna];
+            eprintf("(%d,%d) ", antenna.x, antenna.y);
+        }
+        if (n_antennas[idx_type] > 0) {
+            eprintf("\n");
         }
     }
 
