@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include "common.h"
-#include "../include/pstr.h"
-#include "../include/pstr.c"
+#include "intrinsics.h"
+#include "../common/pstr.h"
+#include "../common/pstr.c"
 
 int main() {
     int fd = open("data/03", O_RDONLY);

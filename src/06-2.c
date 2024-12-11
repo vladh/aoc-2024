@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include "common.h"
+#include "intrinsics.h"
 
 #define GRID_SIZE 200
 

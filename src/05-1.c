@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "common.h"
+#include "intrinsics.h"
 
 #define MAX_N 100
 #define MAX_N_PAIRS 5000

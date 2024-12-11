@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include "common.h"
+#include "intrinsics.h"
 
 #define DISK_LEN 20000 * 9 * 2
 

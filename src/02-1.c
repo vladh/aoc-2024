@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "common.h"
+#include "intrinsics.h"
 
 i64 sign(i64 n) {
     return (n > 0) - (n < 0);

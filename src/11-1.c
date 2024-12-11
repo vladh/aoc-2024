@@ -2,9 +2,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "common.h"
-#include "../include/hashmap.h"
-#include "../include/hashmap.c"
+#include "intrinsics.h"
+#include "../common/hashmap.h"
+#include "../common/hashmap.c"
 
 struct Entry {
     u64 n;

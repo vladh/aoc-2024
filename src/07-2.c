@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "common.h"
+#include "intrinsics.h"
 
 #define MAX_N_TERMS 20
 

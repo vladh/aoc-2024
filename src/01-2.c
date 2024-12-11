@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "common.h"
+#include "intrinsics.h"
 
 int cmp_u32(const void *ap, const void *bp) {
     u32 a = *((u32 *)ap);

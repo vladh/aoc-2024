@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include "common.h"
+#include "intrinsics.h"
 
 i32 const MAX_N_ROWS = 200;
 i32 const MAX_N_COLS = 200;

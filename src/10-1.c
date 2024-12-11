@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include "common.h"
+#include "intrinsics.h"
 
 #define GRID_SIZE 50
 #define MAX_N_THREADS 5000
