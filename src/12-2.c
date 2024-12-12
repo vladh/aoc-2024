@@ -16,11 +16,19 @@ struct Group {
     u64 area;
 };
 
+struct Perimeter {
+    u64 sum;
+    bool top;
+    bool bottom;
+    bool left;
+    bool right;
+};
+
 bool is_in_bounds(i32 x, i32 y, i32 grid_width, i32 grid_height) {
     return x >= 0 && x < grid_width && y >= 0 && y < grid_height;
 }
 
-u64 plot_calc_perimeter(
+struct Perimeter plot_calc_perimeter(
     char plots[GRID_SIZE][GRID_SIZE],
     i32 x,
     i32 y,
@@ -28,20 +36,31 @@ u64 plot_calc_perimeter(
     i32 grid_height
 ) {
     char letter = plots[x][y];
-    i32 perimeter = 0;
+    struct Perimeter perimeter = {0};
 
     for (i32 dy = -1; dy <= 1; dy += 1) {
         for (i32 dx = -1; dx <= 1; dx += 1) {
             if (abs(dx - dy) != 1) {
                 continue;
             }
-            if (!is_in_bounds(x + dx, y + dy, grid_width, grid_height)) {
-                perimeter += 1;
+            if (
+                !is_in_bounds(x + dx, y + dy, grid_width, grid_height) ||
+                plots[x + dx][y + dy] != letter
+            ) {
+                perimeter.sum += 1;
                 continue;
             }
-            char target_letter = plots[x + dx][y + dy];
-            if (target_letter != letter) {
-                perimeter += 1;
+            if (dx == -1) {
+                perimeter.left = true;
+            }
+            if (dx == 1) {
+                perimeter.right = true;
+            }
+            if (dy == -1) {
+                perimeter.top = true;
+            }
+            if (dy == 1) {
+                perimeter.bottom = true;
             }
         }
     }
@@ -60,8 +79,45 @@ void group_fill(
 ) {
     char letter = plots[x][y];
     group->letter = letter;
-    group->perimeter += plot_calc_perimeter(plots, x, y, grid_width, grid_height);
     group->area += 1;
+
+    eprintf("%c at (%d,%d)\n", letter, x, y);
+    struct Perimeter perimeter = plot_calc_perimeter(plots, x, y, grid_width, grid_height);
+    for (i32 dy = -1; dy <= 1; dy += 1) {
+        for (i32 dx = -1; dx <= 1; dx += 1) {
+            if (
+                abs(dx - dy) != 1 ||
+                !is_in_bounds(x + dx, y + dy, grid_width, grid_height) ||
+                !checked[x + dx][y + dy] ||
+                plots[x + dx][y + dy] != letter
+            ) {
+                continue;
+            }
+            eprintf("\tfound friendly at (%d,%d)\n", x + dx, y + dy);
+            eprintf("\tperimeter.sum before: %d\n", perimeter.sum);
+            struct Perimeter candidate_perimeter = plot_calc_perimeter(
+                plots, x + dx, y + dy, grid_width, grid_height);
+            if (dx == -1 || dx == 1) {
+                if (!perimeter.top && !candidate_perimeter.top) {
+                    perimeter.sum -= 1;
+                }
+                if (!perimeter.bottom && !candidate_perimeter.bottom) {
+                    perimeter.sum -= 1;
+                }
+            }
+            if (dy == -1 || dy == 1) {
+                if (!perimeter.left && !candidate_perimeter.left) {
+                    perimeter.sum -= 1;
+                }
+                if (!perimeter.right && !candidate_perimeter.right) {
+                    perimeter.sum -= 1;
+                }
+            }
+            eprintf("\tperimeter.sum after: %d\n", perimeter.sum);
+        }
+    }
+    group->perimeter += perimeter.sum;
+
     checked[x][y] = true;
 
     for (i32 dy = -1; dy <= 1; dy += 1) {
