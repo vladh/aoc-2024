@@ -10,15 +10,15 @@ clean:
 	rm bin/*
 
 bin/%: src/%.c
-	gcc \
+	clang \
 		-Ofast \
 		-D_FORTIFY_SOURCE=2 \
 		-Wall \
 		-Wextra \
 		-Wpedantic \
 		-Wno-unused-result \
-		-ftrapv \
-		-fsanitize=undefined \
+		-Wno-strict-prototypes \
+		-fsanitize=undefined,unsigned-integer-overflow \
 		-ggdb \
 		--std=gnu99 \
 		$< -o $@ -lm
