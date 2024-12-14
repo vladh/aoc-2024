@@ -18,6 +18,7 @@ bin/%: src/%.c
 		-Wpedantic \
 		-Wno-unused-result \
 		-Wno-strict-prototypes \
+		-Wno-gnu-statement-expression-from-macro-expansion \
 		-fsanitize=undefined,unsigned-integer-overflow \
 		-ggdb \
 		--std=gnu99 \
