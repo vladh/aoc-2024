@@ -67,9 +67,9 @@ void find_clusters(
     cluster_sizes[cluster] += 1;
     for (i32 dy = -1; dy <= 1; dy += 1) {
         for (i32 dx = -1; dx <= 1; dx += 1) {
-            /* if (abs(dx - dy) != 1) { */
-            /*     continue; */
-            /* } */
+            if (abs(dx - dy) != 1) {
+                continue;
+            }
             if (!is_in_bounds(x + dx, y + dy, width, height)) {
                 continue;
             }
@@ -116,6 +116,7 @@ int main() {
 
     i32 t = 0;
     i32 largest_cluster = 0;
+    i32 second_largest_cluster = 0;
     while (true) {
         i32 grid[GRID_SIZE][GRID_SIZE] = {0};
         i32 clusters[GRID_SIZE][GRID_SIZE] = {0};
@@ -129,6 +130,7 @@ int main() {
             robot->py = mod(robot->py, height);
             grid[robot->px][robot->py] += 1;
         }
+        t += 1;
 
         for (i32 y = 0; y < height; y += 1) {
             for (i32 x = 0; x < width; x += 1) {
@@ -144,20 +146,23 @@ int main() {
         }
 
         for (i32 i = 0; i < n_clusters; i += 1) {
-            if (cluster_sizes[i] > largest_cluster) {
-                largest_cluster = cluster_sizes[i];
+            if (cluster_sizes[i] > second_largest_cluster) {
+                if (cluster_sizes[i] > largest_cluster) {
+                    second_largest_cluster = largest_cluster;
+                    largest_cluster = cluster_sizes[i];
+                } else {
+                    second_largest_cluster = cluster_sizes[i];
+                }
                 eprintf("%06d - %03d out of %03d\n", t, largest_cluster, n_robots);
-            }
-            if (cluster_sizes[i] >= n_robots / 2) {
-                print_grid(grid, width, height);
-                printf("%d\n", t);
-                goto end;
             }
         }
 
-        t += 1;
+        if (largest_cluster + second_largest_cluster >= n_robots / 2) {
+            print_grid(grid, width, height);
+            printf("%d\n", t);
+            break;
+        }
     }
 
-end:
     return 0;
 }
