@@ -66,7 +66,7 @@ i32 get_new_orientation(i32 dx, i32 dy) {
 void print_grid(
     bool walls[GRID_SIZE][GRID_SIZE],
     i32 grid_width, i32 grid_height,
-    struct Pos start,
+    struct PosOri start,
     struct Pos end,
     i32 dist[GRID_SIZE][GRID_SIZE][4]
 ) {
@@ -84,13 +84,13 @@ void print_grid(
             eprintf("(");
             for (i32 o = 0; o < 4; o += 1) {
                 i32 print_dist = dist[x][y][o];
-                if (print_dist > 99) {
-                    print_dist = 99;
+                if (print_dist > 9999) {
+                    eprintf("    ");
+                } else if (print_dist < 0) {
+                    eprintf("????");
+                } else {
+                    eprintf("%04d", print_dist);
                 }
-                if (print_dist < 0) {
-                    print_dist = -1;
-                }
-                eprintf("%02d", print_dist);
                 if (o < 3) {
                     eprintf(",");
                 }
@@ -110,7 +110,7 @@ int main() {
     i32 dist[GRID_SIZE][GRID_SIZE][4] = {0};
     struct Pos prev[GRID_SIZE][GRID_SIZE][4] = {0};
 
-    int f = open("data/16-test1", O_RDONLY);
+    int f = open("data/16", O_RDONLY);
     if (f == -1) {
         eprintf("Could not open file\n");
         exit(1);
@@ -118,7 +118,7 @@ int main() {
     int len = lseek(f, 0, SEEK_END);
     char *data = mmap(0, len, PROT_READ, MAP_PRIVATE, f, 0);
     char *c = data;
-    struct Pos start;
+    struct PosOri start;
     struct Pos end;
     i32 x = 0;
     i32 y = 0;
@@ -132,7 +132,7 @@ int main() {
             if (*c == '#') {
                 walls[x][y] = true;
             } else if (*c == 'S') {
-                start = (struct Pos) { .x = x, .y = y };
+                start = (struct PosOri) { .x = x, .y = y, .o = 1 };
             } else if (*c == 'E') {
                 end = (struct Pos) { .x = x, .y = y };
             }
@@ -146,7 +146,7 @@ int main() {
     for (i32 y = 0; y < grid_height; y += 1) {
         for (i32 x = 0; x < grid_width; x += 1) {
             for (i32 o = 0; o < 4; o += 1) {
-                if (x == start.x && y == start.y) {
+                if (x == start.x && y == start.y && o == start.o) {
                     dist[x][y][o] = 0;
                 } else {
                     dist[x][y][o] = INT_MAX;
@@ -157,10 +157,10 @@ int main() {
     }
 
     while (true) {
-        print_grid(walls,
-            grid_width, grid_height,
-            start, end,
-            dist);
+        /* print_grid(walls, */
+        /*     grid_width, grid_height, */
+        /*     start, end, */
+        /*     dist); */
 
         struct PosOri curr = (struct PosOri) { .x = -1, .y = -1, .o = -1 };
         i32 min_dist = INT_MAX;
