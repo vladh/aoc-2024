@@ -1,0 +1,8 @@
+b = a mod 3
+b = b xor 3
+c = a / b
+a = a / 8
+b = b xor a
+b = b xor c
+print b
+loop
