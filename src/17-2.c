@@ -192,11 +192,13 @@ int main() {
     struct State orig_state = state;
     u8 sol[MAX_SOL_BITS] = {0};
     sol[state.prog_len - 1] = 3;
+    /* u64 next_ra = sol_to_u64(sol, state.prog_len); */
+    u64 next_ra = 105556639000000;
     while (true) {
-        sol_inc(sol, state.prog_len);
-        u64 next_ra = sol_to_u64(sol, state.prog_len);
+        /* sol_inc(sol, state.prog_len); */
+        /* u64 next_ra = sol_to_u64(sol, state.prog_len); */
         if (next_ra % 100000 == 0) {
-            sol_print(sol, state.prog_len);
+            /* sol_print(sol, state.prog_len); */
             eprintf("(%lu)\n", next_ra);
         }
         state = orig_state;
@@ -210,10 +212,11 @@ int main() {
         }
 
         if (are_progs_equal(state.prog, state.prog_len, state.out, state.out_len)) {
-            sol_print(sol, state.prog_len);
+            /* sol_print(sol, state.prog_len); */
             printf("(%lu)\n", next_ra);
             break;
         }
+        next_ra += 1;
     }
 
     return 0;
